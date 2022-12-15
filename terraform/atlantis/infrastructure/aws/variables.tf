@@ -4,6 +4,7 @@ variable "domain_name" {
         Name of a pre-existing route 53 hosted zone.
         Used for TLS certificate and load balancer.
     EOT
+    default = "bananalab.dev"
 }
 
 variable "host_name" {
