@@ -48,7 +48,7 @@ variable "public_subnet_cidrs" {
         Must be one for each AZ.
         Must be subnets of vpc_cidr.
     EOT
-    default = ["10.0.0.0/20", "10.0.16.0/20"]
+    default = ["10.0.0.0/20", "10.0.64.0/20"]
 }
 
 variable "atlantis_repo_allowlist" {
