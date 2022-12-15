@@ -64,13 +64,14 @@ variable "atlantis_gh_user" {
     description = <<-EOT
         GitHub username of API user.
     EOT
-    default = "Nobody"
+    default = null
 }
 
-variable "atlantis_gh_token" {
+variable "atlantis_gh_token_secret" {
     type = string
     description = <<-EOT
-        GitHub token of API user.
+        ARN of an AWS Secrets Manager secret containing
+        GitHub token
     EOT
-    default = "None"
+    default = null
 }
