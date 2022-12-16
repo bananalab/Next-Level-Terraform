@@ -11,7 +11,8 @@ resource "aws_ecs_task_definition" "atlantis" {
   cpu                      = 256
   memory                   = 512
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
-  container_definitions = jsonencode(
+  task_role_arn            = aws_iam_role.ecs_task_execution_role.arn
+  container_definitions    = jsonencode(
     [
       {
         name      = "atlantis"
@@ -21,6 +22,10 @@ resource "aws_ecs_task_definition" "atlantis" {
           protocol      = "tcp"
           containerPort = 4141
           hostPort      = 4141
+        }]
+        secrets = [{
+          name = "ATLANTIS_GH_TOKEN"
+          valueFrom = var.atlantis_gh_token_secret
         }]
         environment = [
           {
@@ -32,14 +37,19 @@ resource "aws_ecs_task_definition" "atlantis" {
             value = var.atlantis_gh_user
           },
           {
-            name  = "ATLANTIS_GH_TOKEN"
-            value = var.atlantis_gh_token
-          },
-          {
             name = "ATLANTIS_ATLANTIS_URL"
             value = "https://${local.app_host}"
           }
         ]
+        logConfiguration = {
+          logDriver = "awslogs"
+          options = {
+            awslogs-create-group = "true"
+            awslogs-group = "atlantis"
+            awslogs-region = data.aws_region.current.name
+            awslogs-stream-prefix = "atlantis"
+          }
+        }
       }
     ]
   )
@@ -52,15 +62,15 @@ resource "aws_iam_role" "ecs_task_execution_role" {
     {
         "Version": "2012-10-17",
         "Statement": [
-                {
-                    "Action": "sts:AssumeRole",
-                    "Principal": {
-                    "Service": "ecs-tasks.amazonaws.com"
-                    },
-                    "Effect": "Allow",
-                    "Sid": ""
-                }
-            ]
+          {
+            "Action": "sts:AssumeRole",
+            "Principal": {
+              "Service": "ecs-tasks.amazonaws.com"
+            },
+            "Effect": "Allow",
+            "Sid": ""
+          }
+        ]
     }
     EOF
 }
@@ -68,6 +78,11 @@ resource "aws_iam_role" "ecs_task_execution_role" {
 resource "aws_iam_role_policy_attachment" "ecs-task-execution-role-policy-attachment" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+resource "aws_iam_role_policy_attachment" "administrator-access-policy-attachment" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
 }
 
 resource "aws_security_group" "service" {

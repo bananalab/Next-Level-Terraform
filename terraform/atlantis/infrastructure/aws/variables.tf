@@ -4,6 +4,7 @@ variable "domain_name" {
         Name of a pre-existing route 53 hosted zone.
         Used for TLS certificate and load balancer.
     EOT
+    default = "bananalab.dev"
 }
 
 variable "host_name" {
@@ -64,13 +65,14 @@ variable "atlantis_gh_user" {
     description = <<-EOT
         GitHub username of API user.
     EOT
-    default = "Nobody"
+    default = null
 }
 
-variable "atlantis_gh_token" {
+variable "atlantis_gh_token_secret" {
     type = string
     description = <<-EOT
-        GitHub token of API user.
+        ARN of an AWS Secrets Manager secret containing
+        GitHub token
     EOT
-    default = "None"
+    default = null
 }
