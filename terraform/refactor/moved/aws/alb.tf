@@ -1,7 +1,7 @@
 resource "aws_security_group" "atlantis" {
   name        = "allow_atlantis_ports"
   description = "Allow atlantis ports"
-  vpc_id      = aws_vpc.this.id
+  vpc_id = module.vpc.result.vpc.id
 
   ingress {
     description      = "HTTPS from github"
@@ -28,8 +28,8 @@ resource "aws_lb" "this" {
   internal           = false
   load_balancer_type = "application"
   security_groups    = [aws_security_group.atlantis.id]
-  subnets            = [for subnet in aws_subnet.public : subnet.id]
-
+  #subnets            = [for subnet in aws_subnet.public : subnet.id]
+  subnets            = [for subnet in module.vpc.result.public_subnets : subnet.id]
   enable_deletion_protection = false
 }
 
@@ -37,7 +37,8 @@ resource "aws_alb_target_group" "atlantis" {
   name        = "atlantis"
   port        = 4141
   protocol    = "HTTP"
-  vpc_id      = aws_vpc.this.id
+  #vpc_id      = aws_vpc.this.id
+  vpc_id = module.vpc.result.vpc.id
   target_type = "ip"
 
   health_check {
