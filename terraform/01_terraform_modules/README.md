@@ -3,10 +3,6 @@
 Terraform works best when modules are separated from root configs.  The best
 way to achive this is to create separate repositories.
 
-## Clone my repo
-
-1. git clone https://github.com/bananalab/terraform-modules
-
 ## Create your repo
 
 1. Browse to https://github.com/bananalab/terraform-modules-template
